@@ -1,13 +1,26 @@
 var gameContext = (function() {
 
-    var game;
+    var canvas;
     var ball;
+    var world;
 
-    var gameContext = function() {
+    var world = function() {
+        this.worldSize = {
+            maxSizeX: 1000,
+            maxSizeY: 1000
+        };
+        this.maxNumberOfDots = 1000000;
+
+        this.createWorld = function() {
+            //TODO Here will be implemented the createion of the world (all the dots) / with the help of getRandomInt()
+        }
+    }
+
+    var canvasObject = function() {
         
         this.canvas = document.getElementById("canvas");
 
-        this.initGame =  function() {
+        this.drawCanvas =  function() {
             this.canvas.width = window.innerWidth;
             this.canvas.height = window.innerHeight;
             this.context = this.canvas.getContext("2d");
@@ -18,11 +31,11 @@ var gameContext = (function() {
         }
     }
 
-    function ball(radius) {
-        this.context = game.context;
+    function ball(canvas, radius) {
+        this.context = canvas.context;
         this.radius = radius;
-        this.x = game.canvas.width / 2;
-        this.y = game.canvas.height / 2;
+        this.x = canvas.canvas.width / 2;
+        this.y = canvas.canvas.height / 2;
         
         this.update = function() {
             this.context.beginPath();
@@ -36,10 +49,10 @@ var gameContext = (function() {
     }
 
     function createGame() {
-        game = new gameContext();
-        game.initGame();
+        canvas = new canvasObject();
+        canvas.drawCanvas();
 
-        ball = new ball(30);
+        ball = new ball(canvas, 30);
         ball.update();
     }
 
