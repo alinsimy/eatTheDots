@@ -6,30 +6,44 @@ var gameContext = (function() {
     var score;
     var dots = [];
 
+    var dotsType = {
+        safe: "safe",
+        danger: "danger"
+    }
+
     var _world = function() {
         this.worldSize = {
             min: -5000,
             max: 5000
         };
         this.maxNumberOfDots = 1000;
+
+        this.radiusSizes = {
+            min: 10,
+            max: 25
+        }
         this.radius = 10;
 
         this.createWorld = function(canvas) {
-            //TODO Here will be implemented the createion of the world (all the dots) / with the help of getRandomInt()
             var curentNumber = 0;
             while (this.maxNumberOfDots > curentNumber) {
 
-                var canBeCreated = true;
-                var dot = new _dot(getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.worldSize.min, this.worldSize.max), this.radius, canvas);
+                var dotCanBeCreated = true;
+
+                //Add different types of dots
+                    var dot = new _dot(getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.radiusSizes.min, this.radiusSizes.max), dotsType.safe, canvas);
+                } else {
+                    var dot = new _dot(getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.radiusSizes.min, this.radiusSizes.max), dotsType.danger, canvas);
+                }
 
                 //TODO make a faster colision detection (this take to long) 
                 for (var i = dots.length - 1; i >= 0; i--) {
                     if (detectCirclesCollision(dot, dots[i])) {
-                        canBeCreated = false;
+                        dotCanBeCreated = false;
                     }
                 }
 
-                if (canBeCreated) {
+                if (dotCanBeCreated) {
                     dots.push(dot);
                     dot.draw();
                     curentNumber++;
@@ -70,16 +84,23 @@ var gameContext = (function() {
         };
     }
 
-    function _dot(x, y, radius, canvas) {
+    function _dot(x, y, radius, type, canvas) {
         this.context = canvas.context;
         this.x = x;
         this.y = y;
         this.radius = radius;
+        this.type = type;
 
         this.draw = function() {
             this.context.beginPath();
             this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-            this.context.fillStyle = 'green';
+
+            if (this.type === dotsType.safe) {
+                this.context.fillStyle = 'green';
+            } else if(this.type === dotsType.danger) {
+                this.context.fillStyle = 'red';
+            }
+            
             this.context.fill();
         };
     }
@@ -89,8 +110,7 @@ var gameContext = (function() {
         this.score = 0;
         this.x =  20 ;
         this.y = 30;
-        this.context.fillStyle = "#000000";
-        this.context.font = "20px Georgia";
+
         this.draw = function() {
             this.context.fillStyle = "#000000";
             this.context.font = "20px Georgia";
@@ -104,8 +124,13 @@ var gameContext = (function() {
         for (var i = 0; i < dots.length; i++) {
 
             if (detectCirclesCollision(ball, dots[i])) {
+                if (dots[i].type === dotsType.safe) {
+                    score.score += dots[i].radius;
+                } else if (dots[i].type === dotsType.danger) {
+                    score.score -= dots[i].radius * 10;
+                }
+
                 dots.splice(i, 1);
-                score.score += dots[i].radius;
             }
 
             dots[i].x += - byX / 5;
@@ -147,5 +172,3 @@ jQuery(document).ready(function($) {
 function on_device_orientation(event) {
     gameContext.move(event.gamma, event.beta);
 }
-
-    
