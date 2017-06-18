@@ -31,17 +31,12 @@ var gameContext = (function() {
 
                 if (canBeCreated) {
                     dots.push(dot);
+                    dot.draw();
                     curentNumber++;
                 }
                 
             } 
         };
-
-        this.update = function() {
-           for (var i = dots.length - 1; i >= 0; i--) {
-                dots[i].update();
-            }
-        }
     }
 
     var _canvasObject = function() {
@@ -56,7 +51,7 @@ var gameContext = (function() {
 
         this.deleteCanvasElements =  function() {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        }
+        };
     }
 
     function _ball(radius, canvas) {
@@ -65,7 +60,7 @@ var gameContext = (function() {
         this.x = canvas.canvas.width / 2;
         this.y = canvas.canvas.height / 2;
         
-        this.update = function() {
+        this.draw = function() {
             this.context.beginPath();
             this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
             this.context.fillStyle = "#37ce5a";
@@ -82,7 +77,7 @@ var gameContext = (function() {
         this.y = y;
         this.radius = radius;
 
-        this.update = function() {
+        this.draw = function() {
             this.context.beginPath();
             this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
             this.context.fillStyle = 'green';
@@ -92,7 +87,7 @@ var gameContext = (function() {
 
     function move(byX, byY) {
         canvas.deleteCanvasElements();
-        ball.update();
+        ball.draw();
 
         for (var i = 0; i < dots.length; i++) {
 
@@ -102,9 +97,8 @@ var gameContext = (function() {
 
             dots[i].x += - byX / 5;
             dots[i].y += - byY / 5;
-            dots[i].update();
+            dots[i].draw();
         }
-        
     }
 
     function createGame() {
@@ -112,11 +106,10 @@ var gameContext = (function() {
         canvas.drawCanvas();
 
         ball = new _ball(30, canvas);
-        ball.update();
+        ball.draw();
 
         world = new _world();
         world.createWorld(canvas);
-        world.update();
     }
 
     return {
@@ -133,9 +126,7 @@ jQuery(document).ready(function($) {
 });
 
 function on_device_orientation(event) {
-    var beta = event.beta;
-    var gamma = event.gamma;
-    gameContext.move(gamma, beta);
+    gameContext.move(event.gamma, event.beta);
 }
 
     
