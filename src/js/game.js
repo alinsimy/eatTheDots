@@ -95,6 +95,11 @@ var gameContext = (function() {
         ball.update();
 
         for (var i = 0; i < dots.length; i++) {
+
+            if (detectCirclesCollision(ball, dots[i])) {
+                dots.splice(i, 1);
+            }
+
             dots[i].x += - byX / 5;
             dots[i].y += - byY / 5;
             dots[i].update();
