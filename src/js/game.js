@@ -1,39 +1,50 @@
 var gameContext = (function() {
 
+    var gameState;
+    var bestScore;
     var canvas;
     var ball;
     var world;
     var score;
     var dots = [];
 
+    var $onCanvasElements = $(".onCanvasElements");
+
+    var gameStates = {
+        play: 1,
+        gameOver: 0
+    };
+
     var dotsType = {
         safe: "safe",
         danger: "danger"
-    }
+    };
+
+    var radiusSizes = {
+        min: 10,
+        max: 25
+    };  
+
+    var worldSize = {
+        min: -2000,
+        max: 2000
+    };
+
+    var maxNumberOfDots = 1000;
 
     var _world = function() {
-        this.worldSize = {
-            min: -5000,
-            max: 5000
-        };
-        this.maxNumberOfDots = 1000;
-
-        this.radiusSizes = {
-            min: 10,
-            max: 25
-        }
-        this.radius = 10;
-
+        
         this.createWorld = function(canvas) {
             var curentNumber = 0;
-            while (this.maxNumberOfDots > curentNumber) {
+            while (maxNumberOfDots > curentNumber) {
 
                 var dotCanBeCreated = true;
 
                 //Add different types of dots
-                    var dot = new _dot(getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.radiusSizes.min, this.radiusSizes.max), dotsType.safe, canvas);
+                if (curentNumber % 5 == 0) {
+                    var dot = new _dot(getRandomInt(worldSize.min, worldSize.max), getRandomInt(worldSize.min, worldSize.max), getRandomInt(radiusSizes.min, radiusSizes.max), dotsType.safe, canvas);
                 } else {
-                    var dot = new _dot(getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.radiusSizes.min, this.radiusSizes.max), dotsType.danger, canvas);
+                    var dot = new _dot(getRandomInt(worldSize.min, worldSize.max), getRandomInt(worldSize.min, worldSize.max), getRandomInt(radiusSizes.min, radiusSizes.max), dotsType.danger, canvas);
                 }
 
                 //TODO make a faster colision detection (this take to long) 
@@ -72,6 +83,8 @@ var gameContext = (function() {
         this.radius = radius;
         this.x = canvas.canvas.width / 2;
         this.y = canvas.canvas.height / 2;
+        this.currentXPossition = 0;
+        this.currentYPossition = 0;
         
         this.draw = function() {
             this.context.beginPath();
@@ -97,8 +110,14 @@ var gameContext = (function() {
 
             if (this.type === dotsType.safe) {
                 this.context.fillStyle = 'green';
+                this.context.lineWidth = 5;
+                this.context.strokeStyle = "#005d00";
+                this.context.stroke();
             } else if(this.type === dotsType.danger) {
                 this.context.fillStyle = 'red';
+                this.context.lineWidth = 5;
+                this.context.strokeStyle = "#c10000";
+                this.context.stroke();
             }
             
             this.context.fill();
@@ -119,6 +138,13 @@ var gameContext = (function() {
     }
 
     function move(byX, byY) {
+
+        if (gameState === gameStates.gameOver) {
+            $onCanvasElements.show();
+            return;
+        }
+
+        
         canvas.deleteCanvasElements();
         
         for (var i = 0; i < dots.length; i++) {
@@ -127,22 +153,43 @@ var gameContext = (function() {
                 if (dots[i].type === dotsType.safe) {
                     score.score += dots[i].radius;
                 } else if (dots[i].type === dotsType.danger) {
-                    score.score -= dots[i].radius * 10;
+                    score.score -= dots[i].radius * 2;
                 }
 
                 dots.splice(i, 1);
             }
 
-            dots[i].x += - byX / 5;
-            dots[i].y += - byY / 5;
+            dots[i].x += - byX;
+            dots[i].y += - byY;
             dots[i].draw();
+        }
+
+        ball.currentXPossition += - byX;
+        ball.currentYPossition += - byY;
+
+        //TODO this is the test when the ball pass the world border
+        if (ball.currentXPossition > worldSize.max || ball.currentXPossition < worldSize.min || ball.currentYPossition > worldSize.max || ball.currentYPossition < worldSize.min) {
+                
+        }   
+
+        if (score.score < 0) {
+            gameState = gameStates.gameOver;
+            score.score = 0;
         }
 
         ball.draw();
         score.draw();
     }
 
+    function resetGame() {
+        dots = [];
+        createGame();
+        $onCanvasElements.hide();
+    }
+
     function createGame() {
+        gameState = gameStates.play;
+
         canvas = new _canvasObject();
         canvas.drawCanvas();
 
@@ -158,7 +205,8 @@ var gameContext = (function() {
 
     return {
         startGame: createGame,
-        move: move
+        move: move,
+        retry: resetGame
     }
 })();
 
@@ -170,5 +218,5 @@ jQuery(document).ready(function($) {
 });
 
 function on_device_orientation(event) {
-    gameContext.move(event.gamma, event.beta);
+    gameContext.move(event.gamma / 3, event.beta / 3);
 }
