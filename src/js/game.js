@@ -3,20 +3,47 @@ var gameContext = (function() {
     var canvas;
     var ball;
     var world;
+    var dots = [];
 
-    var world = function() {
+    var _world = function() {
         this.worldSize = {
-            maxSizeX: 1000,
-            maxSizeY: 1000
+            min: -10000,
+            max: 10000
         };
-        this.maxNumberOfDots = 1000000;
+        this.maxNumberOfDots = 10000;
+        this.radius = 10;
 
-        this.createWorld = function() {
+        this.createWorld = function(canvas) {
             //TODO Here will be implemented the createion of the world (all the dots) / with the help of getRandomInt()
+            var curentNumber = 0;
+            while (this.maxNumberOfDots > curentNumber) {
+
+                var canBeCreated = true;
+                var dot = new _dot(getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.worldSize.min, this.worldSize.max), this.radius, canvas);
+
+                for (var i = dots.length - 1; i >= 0; i--) {
+                    if (detectCirclesCollision(dot, dots[i])) {
+                        canBeCreated = false;
+                    }
+                    
+                }
+
+                if (canBeCreated) {
+                    dots.push(dot);
+                    curentNumber++;
+                }
+                
+            } 
+        };
+
+        this.update = function() {
+           for (var i = dots.length - 1; i >= 0; i--) {
+                dots[i].update();
+            }
         }
     }
 
-    var canvasObject = function() {
+    var _canvasObject = function() {
         
         this.canvas = document.getElementById("canvas");
 
@@ -31,7 +58,7 @@ var gameContext = (function() {
         }
     }
 
-    function ball(canvas, radius) {
+    function _ball(radius, canvas) {
         this.context = canvas.context;
         this.radius = radius;
         this.x = canvas.canvas.width / 2;
@@ -48,20 +75,44 @@ var gameContext = (function() {
         };
     }
 
+    function _dot(x, y, radius, canvas) {
+        this.context = canvas.context;
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+
+        this.update = function() {
+            this.context.beginPath();
+            this.context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+            this.context.fillStyle = 'green';
+            this.context.fill();
+        };
+    }
+
     function createGame() {
-        canvas = new canvasObject();
+        canvas = new _canvasObject();
         canvas.drawCanvas();
 
-        ball = new ball(canvas, 30);
+        ball = new _ball(30, canvas);
         ball.update();
+
+        world = new _world();
+        world.createWorld(canvas);
+        world.update();
+    }
+
+    function getDots() {
+        console.log(dots);
     }
 
     return {
-        startGame: createGame
+        startGame: createGame,
+        getDots: getDots
     }
 })();
 
 
 jQuery(document).ready(function($) {
     gameContext.startGame();
+    gameContext.getDots();
 });

@@ -5,11 +5,11 @@ function getRandomInt(min, max) {
 }
 
 function detectCirclesCollision(obiect1, object2) {
-    var dx = obiect1.x - obiect2.x;
-    var dy = obiect1.y - obiect2.y;
+    var dx = obiect1.x - object2.x;
+    var dy = obiect1.y - object2.y;
     var distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance < obiect1.radius + obiect2.radius) {
+    if (distance < obiect1.radius + object2.radius) {
         return true;
     }
     return false;
