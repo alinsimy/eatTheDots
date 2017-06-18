@@ -1,14 +1,18 @@
 var gameContext = (function() {
 
-    var game = {
-        canvas: document.getElementById("canvas"),
-        initGame: function() {
-            this.canvas.width = document.body.clientWidth;
-            this.canvas.height = screen.height * 2;
+    var game;
+
+    var gameContext = function() {
+        this.canvas = document.getElementById("canvas"),
+        this.initGame =  function() {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
             this.context = this.canvas.getContext("2d");
         }
     }
+
     function createGame() {
+        game = new gameContext();
         game.initGame();
     }
 
