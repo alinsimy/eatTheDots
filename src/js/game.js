@@ -3,6 +3,7 @@ var gameContext = (function() {
     var canvas;
     var ball;
     var world;
+    var score;
     var dots = [];
 
     var _world = function() {
@@ -26,7 +27,6 @@ var gameContext = (function() {
                     if (detectCirclesCollision(dot, dots[i])) {
                         canBeCreated = false;
                     }
-                    
                 }
 
                 if (canBeCreated) {
@@ -34,7 +34,6 @@ var gameContext = (function() {
                     dot.draw();
                     curentNumber++;
                 }
-                
             } 
         };
     }
@@ -85,20 +84,37 @@ var gameContext = (function() {
         };
     }
 
+    function _score(canvas) {
+        this.context = canvas.context;
+        this.score = 0;
+        this.x =  20 ;
+        this.y = 30;
+        this.context.fillStyle = "#000000";
+        this.context.font = "20px Georgia";
+        this.draw = function() {
+            this.context.fillStyle = "#000000";
+            this.context.font = "20px Georgia";
+            this.context.fillText("Score: " + this.score, this.x, this.y);
+        }
+    }
+
     function move(byX, byY) {
         canvas.deleteCanvasElements();
-        ball.draw();
-
+        
         for (var i = 0; i < dots.length; i++) {
 
             if (detectCirclesCollision(ball, dots[i])) {
                 dots.splice(i, 1);
+                score.score += dots[i].radius;
             }
 
             dots[i].x += - byX / 5;
             dots[i].y += - byY / 5;
             dots[i].draw();
         }
+
+        ball.draw();
+        score.draw();
     }
 
     function createGame() {
@@ -110,6 +126,9 @@ var gameContext = (function() {
 
         world = new _world();
         world.createWorld(canvas);
+
+        score = new _score(canvas);
+        score.draw();
     }
 
     return {
