@@ -7,10 +7,10 @@ var gameContext = (function() {
 
     var _world = function() {
         this.worldSize = {
-            min: -10000,
-            max: 10000
+            min: -5000,
+            max: 5000
         };
-        this.maxNumberOfDots = 10000;
+        this.maxNumberOfDots = 1000;
         this.radius = 10;
 
         this.createWorld = function(canvas) {
@@ -21,6 +21,7 @@ var gameContext = (function() {
                 var canBeCreated = true;
                 var dot = new _dot(getRandomInt(this.worldSize.min, this.worldSize.max), getRandomInt(this.worldSize.min, this.worldSize.max), this.radius, canvas);
 
+                //TODO make a faster colision detection (this take to long) 
                 for (var i = dots.length - 1; i >= 0; i--) {
                     if (detectCirclesCollision(dot, dots[i])) {
                         canBeCreated = false;
@@ -89,6 +90,18 @@ var gameContext = (function() {
         };
     }
 
+    function move(byX, byY) {
+        canvas.deleteCanvasElements();
+        ball.update();
+
+        for (var i = 0; i < dots.length; i++) {
+            dots[i].x += - byX / 5;
+            dots[i].y += - byY / 5;
+            dots[i].update();
+        }
+        
+    }
+
     function createGame() {
         canvas = new _canvasObject();
         canvas.drawCanvas();
@@ -101,18 +114,23 @@ var gameContext = (function() {
         world.update();
     }
 
-    function getDots() {
-        console.log(dots);
-    }
-
     return {
         startGame: createGame,
-        getDots: getDots
+        move: move
     }
 })();
 
 
+
 jQuery(document).ready(function($) {
     gameContext.startGame();
-    gameContext.getDots();
+    window.addEventListener("deviceorientation", on_device_orientation);
 });
+
+function on_device_orientation(event) {
+    var beta = event.beta;
+    var gamma = event.gamma;
+    gameContext.move(gamma, beta);
+}
+
+    
