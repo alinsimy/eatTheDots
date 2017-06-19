@@ -1,5 +1,4 @@
 var gameContext = (function() {
-
     var gameState;
     var bestScore;
     var canvas;
@@ -126,7 +125,7 @@ var gameContext = (function() {
 
     function _score(canvas) {
         this.context = canvas.context;
-        this.score = 66660;
+        this.score = 0;
         this.x =  20 ;
         this.y = 30;
 
@@ -144,7 +143,6 @@ var gameContext = (function() {
             return;
         }
 
-        
         canvas.deleteCanvasElements();
         
         for (var i = 0; i < dots.length; i++) {
@@ -224,6 +222,8 @@ var gameContext = (function() {
 jQuery(document).ready(function($) {
     gameContext.startGame();
     window.addEventListener("deviceorientation", on_device_orientation);
+
+    
 });
 
 function on_device_orientation(event) {
