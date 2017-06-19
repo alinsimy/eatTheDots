@@ -83,8 +83,8 @@ var gameContext = (function() {
         this.radius = radius;
         this.x = canvas.canvas.width / 2;
         this.y = canvas.canvas.height / 2;
-        this.currentXPossition = 0;
-        this.currentYPossition = 0;
+        this.currentXPossition = canvas.canvas.width / 2;
+        this.currentYPossition = canvas.canvas.height / 2;
         
         this.draw = function() {
             this.context.beginPath();
@@ -126,7 +126,7 @@ var gameContext = (function() {
 
     function _score(canvas) {
         this.context = canvas.context;
-        this.score = 0;
+        this.score = 66660;
         this.x =  20 ;
         this.y = 30;
 
@@ -164,12 +164,25 @@ var gameContext = (function() {
             dots[i].draw();
         }
 
-        ball.currentXPossition += - byX;
-        ball.currentYPossition += - byY;
+        ball.currentXPossition += byX;
+        ball.currentYPossition += byY;
 
         //TODO this is the test when the ball pass the world border
         if (ball.currentXPossition > worldSize.max || ball.currentXPossition < worldSize.min || ball.currentYPossition > worldSize.max || ball.currentYPossition < worldSize.min) {
-                
+
+        } 
+
+        if (ball.currentXPossition > worldSize.max) {
+            move(-10, 0);
+        } 
+        if (ball.currentXPossition < worldSize.min) {
+            move(10, 0);
+        }
+        if (ball.currentYPossition > worldSize.max) {
+            move(0, -10);
+        }
+        if (ball.currentYPossition < worldSize.min) {
+            move(0, 10);
         }   
 
         if (score.score < 0) {
