@@ -167,11 +167,7 @@ var gameContext = (function() {
         ball.currentXPossition += byX;
         ball.currentYPossition += byY;
 
-        //TODO this is the test when the ball pass the world border
-        if (ball.currentXPossition > worldSize.max || ball.currentXPossition < worldSize.min || ball.currentYPossition > worldSize.max || ball.currentYPossition < worldSize.min) {
-
-        } 
-
+        // this is the test when the ball pass the world border
         if (ball.currentXPossition > worldSize.max) {
             move(-10, 0);
         } 
